@@ -23,7 +23,7 @@ The tool fetches SRTM elevation data for a user-defined geographic area and prod
 - Subtle hillshade for depth
 - Clean contour lines for structure
 
-![alt text](my_wallpaper_terminillo.png "Example output")
+![alt text](https://github.com/IvanPalm/IsohypsesWallpaper/blob/main/example_output.png "Example output")
 
 ---
 
