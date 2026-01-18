@@ -1,9 +1,9 @@
 import numpy as np
-from PIL import Image
-from matplotlib.colors import to_rgb
+import matplotlib.pyplot as plt
+from matplotlib.colors import LightSource, to_rgb
 from scipy.ndimage import zoom as nd_zoom
-
-from . import scale, metadata
+from PIL import Image, PngImagePlugin
+from . import metadata, scale
 
 
 def generate_wallpaper(
@@ -13,96 +13,85 @@ def generate_wallpaper(
     zoom: int,
     width: int,
     height: int,
-    contour_interval: float | None,
-    contour_color: str = "#FFFFFF",
-    background_color: str = "#0E0E0E",
+    contour_interval: float | None = None,
+    contour_color: str = "white",
+    background_color: str = "#2a2a2a",
     dem_source: str = "SRTM1",
     dem_resolution: int = 30,
     output_path: str = "wallpaper.png",
 ) -> None:
     """
-    Generate a desktop wallpaper from a digital elevation model (DEM) array,
-    optionally overlaying contour lines, and embed EXIF metadata describing
-    the generation parameters.
-
-    This function performs the following steps:
-    1. Computes the ground resolution (meters per pixel) for the given latitude and zoom.
-    2. Scales the DEM array to match the desired output image dimensions.
-    3. Normalizes the DEM values and creates a hillshade-like effect.
-    4. Generates a uniform RGB background and overlays the hillshade.
-    5. Draws contour lines at specified intervals if `contour_interval` is provided.
-    6. Converts the result to a PIL Image and saves it to `output_path`.
-    7. Builds EXIF metadata describing the wallpaper and embeds it in the PNG.
+    Generate a desktop wallpaper from a DEM array with v0.1.0 styling:
+    hillshade overlay on a uniform background, optional contours, 
+    and automatically embed EXIF metadata.
 
     Parameters
     ----------
     dem_array : np.ndarray
-        2D array of elevation values representing the terrain.
+        2D array of elevation values.
     lat : float
-        Latitude of the center of the image (degrees).
+        Latitude of the center.
     lon : float
-        Longitude of the center of the image (degrees).
+        Longitude of the center.
     zoom : int
-        Zoom level used to determine meters per pixel.
+        Zoom level.
     width : int
         Width of the output image in pixels.
     height : int
         Height of the output image in pixels.
     contour_interval : float | None
-        Interval between contour lines in meters. If None, no contours are drawn.
+        Interval of contour lines in meters. If None, no contours.
     contour_color : str
-        Hex color of the contour lines (default: "#FFFFFF").
+        Color of contour lines.
     background_color : str
-        Hex color for the background (default: "#0E0E0E").
+        Background color as a matplotlib-compatible color.
     dem_source : str
-        Identifier of the DEM source used (default: "SRTM1").
+        DEM data source.
     dem_resolution : int
-        Resolution of the DEM in meters (default: 30).
+        DEM resolution in meters.
     output_path : str
-        Path where the resulting PNG wallpaper will be saved (default: "wallpaper.png").
-
-    Returns
-    -------
-    None
-        Saves the wallpaper image to `output_path` and embeds EXIF metadata.
+        File path to save the PNG wallpaper.
     """
-
-    # --- Compute meters per pixel at this latitude and zoom ---
-    m_per_px = scale.meters_per_pixel(lat, zoom)
-
-    # --- Scale DEM to desired resolution ---
+    # --- Resample DEM to target resolution ---
     zoom_y = height / dem_array.shape[0]
     zoom_x = width / dem_array.shape[1]
-    dem_resized = nd_zoom(dem_array, (zoom_y, zoom_x))
+    dem_resampled = nd_zoom(dem_array, (zoom_y, zoom_x), order=1)
 
-    # --- Normalize DEM for hillshade effect ---
-    norm = (dem_resized - np.min(dem_resized)) / (np.ptp(dem_resized) + 1e-9)
+    # --- Compute hillshade ---
+    ls = LightSource(azdeg=315, altdeg=45)
+    hillshade = ls.hillshade(dem_resampled, vert_exag=1)
 
-    # --- Create RGB image with uniform background ---
-    bg_rgb = np.zeros((height, width, 3), dtype=np.uint8)
-    bg_rgb[:, :, :] = np.array(
-        [int(255 * x) for x in to_rgb(background_color)], dtype=np.uint8
-    )
+    # --- Create RGB background modulated by hillshade ---
+    bg_rgb = np.ones((height, width, 3))
+    bg_rgb[:, :, :] = to_rgb(background_color)
+    hillshade_rgb = bg_rgb * hillshade[:, :, np.newaxis]
 
-    # --- Apply hillshade as intensity overlay ---
-    gray = (norm * 255).astype(np.uint8)
-    for i in range(3):
-        bg_rgb[:, :, i] = (
-            bg_rgb[:, :, i].astype(np.float32) * 0.5 + gray * 0.5
-        ).astype(np.uint8)
+    # --- Plot with matplotlib ---
+    fig, ax = plt.subplots(figsize=(width / 100, height / 100), dpi=100)
+    ax.axis("off")
+    extent = (0, width, 0, height)
+    ax.imshow(hillshade_rgb, origin="upper", extent=extent)
 
-    # --- Draw contours ---
+    # --- Overlay contours ---
     if contour_interval is not None:
-        contour_interval_int = int(contour_interval)
-        rgb = tuple(int(255 * x) for x in to_rgb(contour_color))
-        for level in range(0, int(dem_resized.max()), contour_interval_int):
-            mask = np.abs(dem_resized - level) < (contour_interval_int / 10)
-            bg_rgb[mask] = rgb
+        levels = np.arange(dem_resampled.min(), dem_resampled.max(), contour_interval)
+        ax.contour(
+            dem_resampled,
+            levels=levels,
+            colors=contour_color,
+            linewidths=0.5,
+            origin="upper",
+            extent=extent,
+        )
 
-    # --- Convert to PIL Image ---
-    img = Image.fromarray(bg_rgb)
+    plt.tight_layout(pad=0)
+    plt.savefig(output_path, bbox_inches="tight", pad_inches=0)
+    plt.close(fig)
 
-    # --- Build metadata ---
+    # --- Compute meters per pixel for metadata ---
+    m_per_px = scale.meters_per_pixel(lat, zoom)
+
+    # --- Build EXIF metadata ---
     exif_dict = metadata.build_exif_metadata(
         version="0.2.0",
         lat=lat,
@@ -117,17 +106,17 @@ def generate_wallpaper(
             lon - width * m_per_px / 2,
             lon + width * m_per_px / 2,
         ),
-        contour_interval=contour_interval_int if contour_interval is not None else 0,
+        contour_interval=int(contour_interval) if contour_interval else 0,
         contour_color=contour_color,
         background_color=background_color,
         dem_source=dem_source,
         dem_resolution=dem_resolution,
     )
 
-    # --- Save image first ---
-    img.save(output_path)
-
-    # --- Now write metadata ---
-    metadata.write_metadata(
-        image_path=output_path, exif_dict=exif_dict, version="0.2.0"
-    )
+    # --- Embed metadata in the PNG ---
+    img = Image.open(output_path)
+    png_info = PngImagePlugin.PngInfo()
+    user_comment = metadata.exif_dict_to_usercomment(exif_dict)
+    png_info.add_text("UserComment", user_comment)
+    png_info.add_text("Software", "IsohypsesWallpaper")
+    img.save(output_path, pnginfo=png_info)
