@@ -1,6 +1,6 @@
 [project]
 name = "isohypses-wallpaper"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generate desktop wallpapers from topographic contour lines"
 authors = [
     {name = "Ivan Palmegiani",email = "ivan.palmegiani@gmail.com"}
