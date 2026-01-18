@@ -1,39 +1,29 @@
-# Isohypses Wallpaper Generator
+# Isohypses Wallpaper
 
-Isohypses Wallpaper Generator is a command-line application that creates high-resolution desktop wallpapers based on topographic contour lines (isohypses) derived from SRTM elevation data.
+Generate minimalist desktop wallpapers from topographic contour lines (isohypses) and hillshaded relief.
 
-Given a geographic location, a zoom level, and a target screen resolution, the application automatically fetches elevation data, computes contour lines, and renders a wallpaper-sized image that fits the screen exactly.
-
-The project is designed CLI-first, with a modular architecture that will later support a graphical user interface.
-
----
-
-## Motivation
-
-Topographic contour lines are a visually clean and information-rich way to represent terrain. This project aims to make it easy to turn real-world elevation data into aesthetically pleasing desktop backgrounds, while keeping the tool simple, reproducible, and free of proprietary data sources.
+The tool fetches SRTM elevation data for a user-defined geographic area and produces a high-resolution image suitable for desktop backgrounds, with customizable colors and contour spacing.
 
 ---
 
 ## Features
 
-- Global elevation coverage using SRTM data
-- Zoom-based geographic scale (map-style zoom levels)
-- Exact-fit wallpapers for any screen resolution
-- Multiple visual styles (extensible)
-- Automatic contour interval selection
-- Deterministic output for reproducibility
-- Local caching of elevation data
+- Generate wallpapers from real-world terrain
+- Hillshade relief on a uniform background color
+- Optional contour (isohypse) lines
+- Configurable via command line
+- Uses free SRTM elevation data
+- Suitable for widescreen and high-resolution displays
 
 ---
 
-## How It Works
+## Example Output
 
-1. The user specifies a geographic center (latitude and longitude).
-2. A zoom level defines the map scale (meters per pixel).
-3. The screen resolution determines the geographic extent.
-4. SRTM elevation data is downloaded and clipped to that extent.
-5. Contour lines are generated from the elevation raster.
-6. The contours are rendered into a wallpaper-sized image.
+- Uniform background color
+- Subtle hillshade for depth
+- Clean contour lines for structure
+
+(Example images can be added here later.)
 
 ---
 
@@ -41,215 +31,178 @@ Topographic contour lines are a visually clean and information-rich way to repre
 
 ### Requirements
 
-- Python 3.9 or newer
-- Poetry
+- Python 3.12+
+- GDAL (required by SRTM/elevation tools)
 
-If Poetry is not installed, see the official documentation:  
-https://python-poetry.org/docs/#installation
+On Linux (Debian/Ubuntu):
+
+```bash
+sudo apt install gdal-bin libgdal-dev
+```
+
+On macOS (Homebrew):
+
+```bash
+brew install gdal
+```
 
 ---
 
-### Clone the repository
+### Install with Poetry (development)
+
+Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/yourusername/isohypses-wallpaper.git
-cd isohypses-wallpaper
-````
-
----
-
-### Install dependencies with Poetry
-
-```bash
+git clone https://github.com/yourusername/isohypseswallpaper.git
+cd isohypseswallpaper
 poetry install
 ```
 
-This will:
-
-* Create an isolated virtual environment
-* Install all runtime and development dependencies
-* Lock dependency versions in `poetry.lock`
-
-Activate the virtual environment:
-
-```bash
-poetry shell
-```
-
-Or run commands directly:
-
-```bash
-poetry run isohypses-wallpaper --help
-```
-
 ---
 
-## Command Line Usage
+## Usage
 
-Basic usage:
+After installation, the CLI tool is available as:
 
 ```bash
-poetry run isohypses-wallpaper generate \
-  --lat 46.5763 \
-  --lon 7.9904 \
-  --zoom 11 \
-  --width 3840 \
-  --height 2160 \
-  --output wallpaper.png
+isohypses-wallpaper
+```
+
+### Basic example
+
+```bash
+isohypses-wallpaper \
+  --lat 42.0 \
+  --lon 12.0 \
+  --zoom 12 \
+  --width 1920 \
+  --height 1080 \
+  --contour 50 \
+  --output my_wallpaper.png
 ```
 
 ---
 
-### Required arguments
+## Command-line options
 
-* `--lat`
-  Latitude of the image center.
+| Argument          | Description                           |
+| ----------------- | ------------------------------------- |
+| `--lat`           | Latitude of the map center            |
+| `--lon`           | Longitude of the map center           |
+| `--zoom`          | Web Mercator zoom level               |
+| `--width`         | Output image width in pixels          |
+| `--height`        | Output image height in pixels         |
+| `--contour`       | Contour interval in meters (optional) |
+| `--bgcolor`       | Background color (default: `#2a2a2a`) |
+| `--contour-color` | Contour line color (default: `white`) |
+| `--output`        | Output image file path                |
 
-* `--lon`
-  Longitude of the image center.
-
-* `--zoom`
-  Map-style zoom level defining the geographic scale.
-
-* `--width`
-  Output image width in pixels.
-
-* `--height`
-  Output image height in pixels.
-
-* `--output`
-  Path to the output image file.
-
----
-
-### Optional arguments
-
-* `--style`
-  Visual style preset (default: minimal).
-
-* `--interval`
-  Contour interval in meters. If omitted, the interval is chosen automatically.
-
-* `--cache-dir`
-  Directory used to cache downloaded elevation data.
+> [!TIP]
+> Zoom levels follow the standard Web Mercator convention.  
+> 
+> Lower zoom levels cover larger areas with less detail, higher zoom levels cover smaller areas with more detail.
+> 
+> Typical usage ranges:
+> 
+> * Zoom 7–9: large regions, mountain ranges
+> * Zoom 10–11: cities and surrounding terrain
+> * Zoom 12–13: valleys, ridges, local landscapes
+> 
+> Very high zoom levels may exceed the native resolution of SRTM data and will not add real terrain detail.
 
 ---
 
-## Zoom Levels and Scale
+## How it works
 
-Zoom levels follow the standard Web Mercator convention.
-Lower zoom levels cover larger areas with less detail, higher zoom levels cover smaller areas with more detail.
-
-Typical usage ranges:
-
-* Zoom 7–9: large regions, mountain ranges
-* Zoom 10–11: cities and surrounding terrain
-* Zoom 12–13: valleys, ridges, local landscapes
-
-Very high zoom levels may exceed the native resolution of SRTM data and will not add real terrain detail.
+1. Converts zoom level and latitude to meters-per-pixel using Web Mercator rules
+2. Computes a geographic bounding box matching the requested screen size
+3. Downloads and clips SRTM elevation data
+4. Resamples DEM to match output resolution
+5. Computes hillshade
+6. Applies hillshade to a uniform background color
+7. Optionally overlays contour lines
+8. Saves the final image
 
 ---
 
-## Elevation Data
+## Design Philosophy
 
-This application uses Shuttle Radar Topography Mission (SRTM) data:
-
-* Approximate resolution: 30 meters
-* Units: meters above sea level
-* Coverage: most land areas between 60°N and 60°S
-
-SRTM data is free and publicly available.
+* Minimalist aesthetics
+* Accurate geographic proportions
+* No map labels, borders, or clutter
+* Wallpaper-first (not cartography-first)
 
 ---
 
-## Project Structure
+## Development
 
-```text
-isohypses_wallpaper/
-├── src/
-│   └── isohypses_wallpaper/
-│       ├── cli.py
-│       ├── config.py
-│       ├── scale.py
-│       ├── geometry.py
-│       ├── srtm.py
-│       ├── contours.py
-│       ├── render.py
-│       └── styles/
-├── tests/
-├── README.md
+### Run tests
+
+```bash
+poetry run pytest
+```
+
+### Project structure
+
+´´´text
+isohypseswallpaper/
 ├── pyproject.toml
-└── poetry.lock
-```
+├── README.md
+├── LICENSE
+├── .gitignore
+│
+├── src/
+│   └── isohypseswallpaper/
+│       ├── __init__.py
+│       ├── cli.py          # Command-line interface
+│       ├── scale.py        # Zoom <--> meters conversion
+│       ├── geometry.py     # Bounding box calculations
+│       ├── srtm.py         # DEM fetching and clipping
+│       └── wallpaper.py    # Rendering logic
+│
+└── tests/
+    ├── __init__.py
+    ├── test_cli.py         # CLI integration tests (mocked)
+    ├── test_scale.py       # Tests for zoom / scale utilities
+    ├── test_geometry.py    # Tests for bounding box logic
+    ├── test_srtm.py        # Tests for DEM fetching (mocked I/O)
+    └── test_wallpaper.py   # Tests for rendering logic
+´´´
+> [!NOTE]
+> - `src/` layout prevents accidental imports from the working directory.
+> - Tests are kept outside `src/`, as recommended by PyPA.
+> - Heavy I/O (SRTM downloads, file writes) is mocked in tests.
+> `test_cli.py` is optional but useful to validate argument wiring and integration.
 
 ---
 
-## Docker (Optional)
+## Data Sources
 
-For a fully reproducible environment, the application can be run in Docker.
-
-### Build the image
-
-```bash
-docker build -t isohypses-wallpaper .
-```
-
-### Run the container
-
-```bash
-docker run --rm \
-  -v $(pwd):/data \
-  isohypses-wallpaper generate \
-  --lat 46.5763 \
-  --lon 7.9904 \
-  --zoom 11 \
-  --width 3840 \
-  --height 2160 \
-  --output /data/wallpaper.png
-```
-
-The output image will be written to the local directory.
-
----
-
-## Development Workflow
-
-* Install dependencies: `poetry install`
-* Add a dependency: `poetry add <package>`
-* Run commands: `poetry run <command>`
-* Run tests: `poetry run pytest`
-* Build Docker image for reproducibility or CI
-
----
-
-## Design Principles
-
-* Clear separation between data handling, geometry, and rendering
-* Configuration-driven core logic
-* Minimal assumptions about output usage
-* Extensible architecture for styles and interfaces
-
----
-
-## Limitations
-
-* SRTM data does not cover polar regions
-* Fine zoom levels may exceed the native resolution of the DEM
-* Rendering is raster-based; vector output is not currently supported
-
----
-
-## Roadmap
-
-* Additional visual styles
-* Improved contour smoothing and simplification
-* Configuration presets
-* Graphical user interface
-* Optional SVG export
+* Elevation data: NASA SRTM (via `elevation` library)
+  * Resolution: ~30m (SRTM1)
 
 ---
 
 ## License
 
-This project is released under an open-source license.
-See the LICENSE file for details.
+GNU General Public License (see `LICENSE` file).
+
+---
+
+## Roadmap
+
+- [x] CLI tool  
+- [ ] GUI frontend  
+- [ ] Multiple contour styles  
+- [ ] Export presets for common screen sizes  
+- [ ] Batch wallpaper generation  
+- [ ] Optional vector output (SVG)  
+
+---
+
+## Acknowledgements
+
+* NASA / USGS for SRTM data
+* GDAL and rasterio projects
+* matplotlib and scipy communities
+
