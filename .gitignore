@@ -73,3 +73,5 @@ Thumbs.db
 *.jpeg
 *.tif
 *.tiff
+
+!example_output.png
