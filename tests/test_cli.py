@@ -64,10 +64,10 @@ def test_cli_calls_pipeline(monkeypatch):
     assert calls["get_dem"] == (0.0, 1.0, 2.0, 3.0, 30)
 
     wallpaper_call = calls["generate_wallpaper"]
-    assert wallpaper_call["dem"] == "DEM_ARRAY"
+    assert wallpaper_call["dem_array"] == "DEM_ARRAY"
     assert wallpaper_call["output_path"] == "output.png"
-    assert wallpaper_call["width_px"] == 1920
-    assert wallpaper_call["height_px"] == 1080
+    assert wallpaper_call["width"] == 1920
+    assert wallpaper_call["height"] == 1080
     assert wallpaper_call["background_color"] == "#1a1a1a"
     assert wallpaper_call["contour_color"] == "cyan"
     assert wallpaper_call["contour_interval"] == 50.0
