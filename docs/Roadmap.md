@@ -1,6 +1,6 @@
 # Roadmap
 
-This document outlines the planned evolution of **IsohypsesWallpaper**, starting from the current CLI-based prototype toward a more complete and user-friendly tool.
+This document outlines the planned evolution of **IsohypsesWallpaper**, starting from the CLI-based prototype toward a more complete and user-friendly tool.
 
 The version numbers are indicative and may change as development progresses.
 
@@ -26,7 +26,7 @@ This version establishes a solid technical base. The goal is to make sure the ma
 
 ---
 
-## Version 0.2.0 – Metadata & Presets
+## Version 0.2.x – Metadata & Presets
 
 **Status:** Planned  
 **Focus:** Reproducibility and ease of use
@@ -51,7 +51,7 @@ Screen-size presets remove friction for common use cases while keeping flexibili
 
 ---
 
-## Version 0.3.0 – Color Themes
+## Version 0.3.x – Color Themes
 
 **Status:** Planned  
 **Focus:** Visual quality and usability
@@ -67,7 +67,7 @@ Choosing colors is one of the most visible parts of the output. Presets help use
 
 ---
 
-## Version 0.4.0 – Batch Generation
+## Version 0.4.x – Batch Generation
 
 **Status:** Planned  
 **Focus:** Automation and productivity
@@ -85,7 +85,7 @@ Batch mode makes the tool useful for collections, experiments, and automation. I
 
 ---
 
-## Version 0.5.0 – Vector Output (SVG)
+## Version 0.5.x – Vector Output (SVG)
 
 **Status:** Planned  
 **Focus:** High-quality and scalable output
@@ -100,7 +100,7 @@ Vector output allows infinite scaling and post-processing in design tools. This 
 
 ---
 
-## Version 0.6.0 – GUI Frontend
+## Version 0.6.x – GUI Frontend
 
 **Status:** Planned  
 **Focus:** Accessibility and interactivity
