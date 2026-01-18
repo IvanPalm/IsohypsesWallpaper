@@ -144,30 +144,32 @@ poetry run pytest
 
 ### Project structure
 
-´´´text
-isohypseswallpaper/
-├── pyproject.toml
-├── README.md
-├── LICENSE
-├── .gitignore
-│
-├── src/
-│   └── isohypseswallpaper/
-│       ├── __init__.py
-│       ├── cli.py          # Command-line interface
-│       ├── scale.py        # Zoom <--> meters conversion
-│       ├── geometry.py     # Bounding box calculations
-│       ├── srtm.py         # DEM fetching and clipping
-│       └── wallpaper.py    # Rendering logic
-│
-└── tests/
-    ├── __init__.py
-    ├── test_cli.py         # CLI integration tests (mocked)
-    ├── test_scale.py       # Tests for zoom / scale utilities
-    ├── test_geometry.py    # Tests for bounding box logic
-    ├── test_srtm.py        # Tests for DEM fetching (mocked I/O)
-    └── test_wallpaper.py   # Tests for rendering logic
-´´´
+```text
+
+isohypseswallpaper/  
+├── pyproject.toml  
+├── README.md  
+├── LICENSE  
+├── .gitignore  
+│  
+├── src/  
+│   └── isohypseswallpaper/  
+│       ├── __init__.py  
+│       ├── cli.py          # Command-line interface  
+│       ├── scale.py        # Zoom <--> meters conversion  
+│       ├── geometry.py     # Bounding box calculations  
+│       ├── srtm.py         # DEM fetching and clipping  
+│       └── wallpaper.py    # Rendering logic  
+│  
+└── tests/  
+    ├── __init__.py  
+    ├── test_cli.py         # CLI integration tests (mocked)  
+    ├── test_scale.py       # Tests for zoom / scale utilities  
+    ├── test_geometry.py    # Tests for bounding box logic  
+    ├── test_srtm.py        # Tests for DEM fetching (mocked I/O)  
+    └── test_wallpaper.py   # Tests for rendering logic  
+```
+
 > [!NOTE]
 > - `src/` layout prevents accidental imports from the working directory.
 > - Tests are kept outside `src/`, as recommended by PyPA.
