@@ -31,7 +31,7 @@ This version establishes a solid technical base. The goal is to make sure the ma
 **Status:** Planned  
 **Focus:** Reproducibility and ease of use
 
-### Planned features
+### Features
 - Embed generation parameters into image metadata:
   - latitude, longitude
   - zoom level
@@ -56,7 +56,7 @@ Screen-size presets remove friction for common use cases while keeping flexibili
 **Status:** Planned  
 **Focus:** Visual quality and usability
 
-### Planned features
+### Features
 - Built-in color themes (background + contour combinations)
 - Clear naming for themes (e.g. “Dark Minimal”, “Paper Map”)
 - Ability to override any theme with custom colors
@@ -72,7 +72,7 @@ Choosing colors is one of the most visible parts of the output. Presets help use
 **Status:** Planned  
 **Focus:** Automation and productivity
 
-### Planned features
+### Features
 - Generate multiple wallpapers in one run:
   - multiple locations
   - multiple zoom levels
@@ -90,7 +90,7 @@ Batch mode makes the tool useful for collections, experiments, and automation. I
 **Status:** Planned  
 **Focus:** High-quality and scalable output
 
-### Planned features
+### Features
 - Optional SVG output for contour lines
 - Resolution-independent output
 - Support for large-format printing and design workflows
@@ -105,7 +105,7 @@ Vector output allows infinite scaling and post-processing in design tools. This 
 **Status:** Planned  
 **Focus:** Accessibility and interactivity
 
-### Planned features
+### Features
 - Cross-platform GUI (desktop-first)
 - Interactive map preview
 - Live updates when changing parameters
