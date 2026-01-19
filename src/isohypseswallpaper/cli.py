@@ -1,3 +1,4 @@
+# /src/isohypseswallpaper/cli.py
 """
 Command-line interface for generating isohypses wallpapers.
 """

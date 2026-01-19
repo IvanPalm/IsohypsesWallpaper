@@ -1,4 +1,5 @@
-# tests/test_smoke.py
+# /tests/test_smoke.py
+
 import tempfile
 import numpy as np
 import os

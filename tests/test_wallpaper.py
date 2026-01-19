@@ -1,3 +1,5 @@
+# /tests/test_wallpaper.py
+
 import numpy as np
 import pytest
 from unittest.mock import patch

@@ -1,4 +1,4 @@
-# tests/test_metadata.py
+# /tests/test_metadata.py
 
 import re
 from isohypseswallpaper.metadata import build_exif_metadata, exif_dict_to_usercomment

@@ -1,3 +1,4 @@
+# /src/isohypseswallpaper/geometry.py
 """
 Geometry utilities.
 

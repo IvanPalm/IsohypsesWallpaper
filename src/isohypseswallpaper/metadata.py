@@ -1,3 +1,5 @@
+# /src/isohypseswallpaper/metadata.py
+
 from datetime import datetime, timezone
 from typing import Tuple, Dict
 from PIL import PngImagePlugin, Image
