@@ -21,6 +21,7 @@ def test_cli_calls_pipeline(monkeypatch):
         zoom=12,
         width=1920,
         height=1080,
+        preset=None,
         contour=50.0,
         bgcolor="#1a1a1a",
         contour_color="cyan",
