@@ -18,7 +18,7 @@ def test_cli_calls_pipeline(monkeypatch):
     mock_args = Namespace(
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         width=1920,
         height=1080,
         preset=None,
@@ -26,6 +26,8 @@ def test_cli_calls_pipeline(monkeypatch):
         bgcolor="#1a1a1a",
         contour_color="cyan",
         output="output.png",
+        theme=None,
+        list_themes=False,
     )
 
     monkeypatch.setattr(cli.argparse.ArgumentParser, "parse_args", lambda self: mock_args)

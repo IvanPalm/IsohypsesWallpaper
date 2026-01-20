@@ -25,7 +25,7 @@ def test_generate_wallpaper_basic(mock_save, dummy_dem):
         dem_array=dem,
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         width=width_px,
         height=height_px,
         contour_interval=10,
@@ -51,7 +51,7 @@ def test_generate_wallpaper_no_contours(mock_save, dummy_dem):
         dem_array=dem,
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         width=100,
         height=100,
         contour_interval=None,  # No contours

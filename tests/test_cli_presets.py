@@ -14,7 +14,7 @@ def test_cli_uses_1080p_preset(monkeypatch):
     mock_args = Namespace(
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         preset="1080p",
         width=999,   # should be ignored
         height=999,  # should be ignored
@@ -22,6 +22,8 @@ def test_cli_uses_1080p_preset(monkeypatch):
         bgcolor="#1a1a1a",
         contour_color="cyan",
         output="output.png",
+        theme=None,
+        list_themes=False,
     )
 
     monkeypatch.setattr(
@@ -65,7 +67,7 @@ def test_cli_custom_resolution_without_preset(monkeypatch):
     mock_args = Namespace(
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         preset=None,
         width=1600,
         height=900,
@@ -73,6 +75,8 @@ def test_cli_custom_resolution_without_preset(monkeypatch):
         bgcolor="#2a2a2a",
         contour_color="white",
         output="output.png",
+        theme=None,
+        list_themes=False,
     )
 
     monkeypatch.setattr(
@@ -114,7 +118,7 @@ def test_cli_errors_without_preset_or_resolution(monkeypatch):
     mock_args = Namespace(
         lat=42.0,
         lon=12.0,
-        zoom=12,
+        zoom_level=12,
         preset=None,
         width=None,
         height=None,
@@ -122,6 +126,8 @@ def test_cli_errors_without_preset_or_resolution(monkeypatch):
         bgcolor="#2a2a2a",
         contour_color="white",
         output="output.png",
+        theme=None,
+        list_themes=False,
     )
 
     monkeypatch.setattr(

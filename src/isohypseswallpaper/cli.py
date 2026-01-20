@@ -4,7 +4,7 @@ Command-line interface for generating isohypses wallpapers.
 """
 
 import argparse
-from isohypseswallpaper import scale, geometry, srtm, wallpaper
+from isohypseswallpaper import scale, geometry, srtm, wallpaper, themes
 
 from .presets import SCREEN_PRESETS
 
@@ -19,13 +19,9 @@ def main():
     parser.add_argument(
         "--lon", type=float, required=True, help="Longitude of the center"
     )
-    parser.add_argument("--zoom", type=int, required=True, help="Zoom level")
-    parser.add_argument(
-        "--width", type=int, help="Screen width in pixels"
-    )
-    parser.add_argument(
-        "--height", type=int, help="Screen height in pixels"
-    )
+    parser.add_argument("--zoom_level", type=int, required=True, help="Zoom level")
+    parser.add_argument("--width", type=int, help="Screen width in pixels")
+    parser.add_argument("--height", type=int, help="Screen height in pixels")
     parser.add_argument(
         "--contour", type=float, default=None, help="Contour interval in meters"
     )
@@ -39,13 +35,28 @@ def main():
         "--output", type=str, required=True, help="Output PNG file path"
     )
     parser.add_argument(
-        "--preset", type=str, choices=["1080p", "1440p", "4k", "ultrawide"], help="Screen size preset",
+        "--preset",
+        type=str,
+        choices=["1080p", "1440p", "4k", "ultrawide"],
+        help="Screen size preset",
+    )
+    parser.add_argument(
+        "--theme", type=str, choices=themes.list_themes()
+        )
+    parser.add_argument(
+        "--list-themes", action="store_true", help="List available themes"
     )
 
     args = parser.parse_args()
 
+    if args.list_themes:
+        print("Available themes:")
+        for t in themes.list_themes():
+            print(" -", t)
+        return
+
     # Compute meters per pixel at the center latitude
-    m_per_px = scale.meters_per_pixel(args.lat, args.zoom)
+    m_per_px = scale.meters_per_pixel(args.lat, args.zoom_level)
 
     # Resolve width and heigth
     preset = getattr(args, "preset", None)
@@ -76,12 +87,13 @@ def main():
         dem_array=dem_array,
         lat=args.lat,
         lon=args.lon,
-        zoom=args.zoom,
+        zoom_level=args.zoom_level,
         width=width,
         height=height,
         contour_interval=args.contour,
-        contour_color=args.contour_color,
-        background_color=args.bgcolor,
+        background_color=args.bgcolor or "#2a2a2a",
+        contour_color=args.contour_color or "white",
+        theme=args.theme,
         dem_source="SRTM1",
         dem_resolution=30,
         output_path=args.output,

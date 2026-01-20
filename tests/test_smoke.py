@@ -35,13 +35,15 @@ def test_smoke_pipeline_runs():
             args = SimpleNamespace(
                 lat=42.0,
                 lon=12.0,
-                zoom=12,
+                zoom_level=12,
                 width=100,
                 height=100,
                 contour=10,
                 bgcolor="#111111",
                 contour_color="white",
                 output=output_path,
+                theme=None,
+                list_themes=False,
             )
             with patch("argparse.ArgumentParser.parse_args", return_value=args):
                 # Run CLI main function
