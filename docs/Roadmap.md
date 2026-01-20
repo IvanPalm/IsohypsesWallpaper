@@ -12,14 +12,14 @@ The version numbers are indicative and may change as development progresses.
 **Focus:** Core functionality and correctness
 
 ### Features
-- CLI tool for generating wallpapers from SRTM elevation data
-- Zoom-based scale calculation
-- Bounding box computation from center + screen size
-- DEM download and clipping via SRTM
-- Contour line rendering
-- Uniform background color
-- Custom output resolution
-- Automated tests for core modules
+-[x] CLI tool for generating wallpapers from SRTM elevation data
+-[x] Zoom-based scale calculation
+-[x] Bounding box computation from center + screen size
+-[x] DEM download and clipping via SRTM
+-[x] Contour line rendering
+-[x] Uniform background color
+-[x] Custom output resolution
+-[x] Automated tests for core modules
 
 ### Rationale
 This version establishes a solid technical base. The goal is to make sure the math, data handling, and rendering pipeline are correct before adding more features.
@@ -32,22 +32,22 @@ This version establishes a solid technical base. The goal is to make sure the ma
 **Focus:** Reproducibility and ease of use
 
 ### Features
-- Embed generation parameters into image metadata:
+- [x] Embed generation parameters into image metadata:
   - latitude, longitude
   - zoom level
   - contour interval
   - colors
   - generation date
-- Presets for common screen sizes:
+- [x] Presets for common screen sizes:
   - 1080p
   - 1440p
   - 4K
   - Ultrawide
-- Keep full support for custom resolutions
+  - Keep full support for custom resolutions
 
 ### Rationale
 Metadata makes wallpapers easier to reproduce and organize later.  
-Screen-size presets remove friction for common use cases while keeping flexibility for advanced users.
+Screen-size presets remove friction for common use cases while keeping flexibility for others.
 
 ---
 
@@ -57,10 +57,10 @@ Screen-size presets remove friction for common use cases while keeping flexibili
 **Focus:** Visual quality and usability
 
 ### Features
-- Built-in color themes (background + contour combinations)
-- Clear naming for themes (e.g. “Dark Minimal”, “Paper Map”)
-- Ability to override any theme with custom colors
-- CLI option to list available themes
+- [ ] Built-in color themes (background + contour combinations)
+  - [ ] Clear naming for themes (e.g. “Dark Minimal”, “Paper Map”)
+  - [ ] Ability to override any theme with custom colors
+  - [ ] CLI option to list available themes
 
 ### Rationale
 Choosing colors is one of the most visible parts of the output. Presets help users get good-looking results quickly, while custom colors keep creative freedom.
@@ -73,12 +73,12 @@ Choosing colors is one of the most visible parts of the output. Presets help use
 **Focus:** Automation and productivity
 
 ### Features
-- Generate multiple wallpapers in one run:
-  - multiple locations
-  - multiple zoom levels
-  - multiple color themes
-- Optional configuration file (YAML or TOML)
-- Automatic output naming
+- [ ] Generate multiple wallpapers in one run:
+  - [ ] multiple locations
+  - [ ] multiple zoom levels
+  - [ ] multiple color themes
+- [ ] Optional configuration file (YAML or TOML)
+- [ ] Automatic output naming
 
 ### Rationale
 Batch mode makes the tool useful for collections, experiments, and automation. It also prepares the ground for future GUI features.
@@ -91,9 +91,9 @@ Batch mode makes the tool useful for collections, experiments, and automation. I
 **Focus:** High-quality and scalable output
 
 ### Features
-- Optional SVG output for contour lines
-- Resolution-independent output
-- Support for large-format printing and design workflows
+- [ ] Optional SVG output for contour lines
+- [ ] Resolution-independent output
+- [ ] Support for large-format printing and design workflows
 
 ### Rationale
 Vector output allows infinite scaling and post-processing in design tools. This expands the project beyond wallpapers into cartography and graphic design use cases.
@@ -106,12 +106,12 @@ Vector output allows infinite scaling and post-processing in design tools. This 
 **Focus:** Accessibility and interactivity
 
 ### Features
-- Cross-platform GUI (desktop-first)
-- Interactive map preview
-- Live updates when changing parameters
-- Export using the same core engine as the CLI
+- [ ] Cross-platform GUI (desktop-first)
+  - [ ] Interactive map preview
+  - [ ] Live updates when changing parameters
+  - [ ] Export using the same core engine as the CLI
 
-### Rationale
+## Rationale
 A GUI makes the tool accessible to non-technical users and supports exploration and experimentation. Keeping the CLI and GUI on top of the same core logic avoids code duplication.
 
 ---
