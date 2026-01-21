@@ -2,29 +2,39 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LightSource, to_rgb, to_rgba
+from matplotlib.colors import (
+    LightSource,
+    to_rgb,
+    LinearSegmentedColormap,
+    Normalize,
+)
 from scipy.ndimage import zoom
-from PIL import Image
 from . import metadata, scale, themes
+
 
 def interpolate_colors(colors: list[str], values: np.ndarray) -> np.ndarray:
     """
     Interpolate RGB colors over a normalized array of values (0-1).
 
     colors: list of hex colors (e.g. ["#000000", "#ffffff"])
-    values: 2D array normalized 0..1
-    Returns: 3D array of RGB values
+    values: array normalized 0..1
+    Returns: array with last dimension RGB
     """
-    from matplotlib.colors import to_rgb
     colors_rgb = np.array([to_rgb(c) for c in colors])
     n = len(colors_rgb)
-    # Map values 0..1 to index in gradient
+
     idx = values * (n - 1)
     idx_floor = np.floor(idx).astype(int)
-    idx_ceil = np.ceil(idx).astype(int)
+    idx_ceil = np.clip(idx_floor + 1, 0, n - 1)
     t = idx - idx_floor
-    rgb = (1 - t[..., None]) * colors_rgb[idx_floor] + t[..., None] * colors_rgb[idx_ceil]
-    return rgb
+
+    return (1 - t[..., None]) * colors_rgb[idx_floor] + t[..., None] * colors_rgb[idx_ceil]
+
+
+def make_colormap(colors: list[str], name: str = "custom"):
+    """Create a matplotlib colormap from a list of colors."""
+    return LinearSegmentedColormap.from_list(name, colors)
+
 
 def generate_wallpaper(
     dem_array: np.ndarray,
@@ -44,37 +54,13 @@ def generate_wallpaper(
     """
     Generate a desktop wallpaper with hillshades, optional contour lines,
     and dynamic/static color themes.
-
-    Parameters
-    ----------
-    dem_array : np.ndarray
-        2D array of elevation values
-    lat, lon : float
-        Center coordinates
-    zoom_level : int
-        Zoom level
-    width, height : int
-        Target image size in pixels
-    contour_interval : float | None
-        Spacing between contour lines
-    background_color : str | list[str]
-        Single color or gradient (dynamic) for background
-    contour_color : str | list[str]
-        Single color or gradient (dynamic) for contours
-    theme : str | None
-        Optional theme to override colors
-    dem_source : str
-        Source DEM
-    dem_resolution : int
-        Resolution in meters
-    output_path : str
-        Output PNG path
     """
-    # --- Apply theme if provided ---
-    if theme :
-        theme = themes.get_theme(theme)
-        background_color = theme["background"]
-        contour_color = theme["contour"]
+
+    # --- Apply theme ---
+    if theme:
+        theme_def = themes.get_theme(theme)
+        background_color = theme_def["background"]
+        contour_color = theme_def["contour"]
 
     # --- Resample DEM ---
     zoom_y = height / dem_array.shape[0]
@@ -85,11 +71,10 @@ def generate_wallpaper(
     ls = LightSource(azdeg=315, altdeg=45)
     hillshade = ls.hillshade(dem_resampled, vert_exag=1)
 
-    # --- Normalize DEM for color mapping ---
-    dem_min = np.min(dem_resampled)
-    dem_max = np.max(dem_resampled)
-    dem_range = dem_max - dem_min + 1e-9
-    dem_norm = (dem_resampled - dem_min) / dem_range
+    # --- Normalize DEM ---
+    dem_min = dem_resampled.min()
+    dem_max = dem_resampled.max()
+    dem_norm = (dem_resampled - dem_min) / (dem_max - dem_min + 1e-9)
 
     # --- Background ---
     if isinstance(background_color, list):
@@ -97,40 +82,48 @@ def generate_wallpaper(
     else:
         bg_rgb = np.ones((height, width, 3)) * np.array(to_rgb(background_color))
 
-    hillshade_rgb = bg_rgb * hillshade[:, :, np.newaxis]
+    hillshade_rgb = bg_rgb * hillshade[:, :, None]
 
-    # --- Setup matplotlib figure ---
+    # --- Figure ---
     fig, ax = plt.subplots(figsize=(width / 100, height / 100), dpi=100)
     ax.axis("off")
     extent = (0, width, 0, height)
+
     ax.imshow(hillshade_rgb, origin="upper", extent=extent)
 
     # --- Contours ---
     if contour_interval is not None:
-        levels = np.arange(dem_resampled.min(), dem_resampled.max(), contour_interval)
+        levels = np.arange(dem_min, dem_max, contour_interval)
 
         if isinstance(contour_color, list):
-            # Sample the gradient evenly across contour levels
-            t = np.linspace(0, 1, len(levels))
-            colors_rgb = interpolate_colors(contour_color, t[:, None])[:, 0, :]
+            cmap = make_colormap(contour_color, name="contour_gradient")
+            norm = Normalize(vmin=dem_min, vmax=dem_max)
+
+            ax.contour(
+                dem_resampled,
+                levels=levels,
+                cmap=cmap,
+                norm=norm,
+                linewidths=0.6,
+                origin="upper",
+                extent=extent,
+            )
         else:
-            colors_rgb = contour_color
+            ax.contour(
+                dem_resampled,
+                levels=levels,
+                colors=contour_color,
+                linewidths=0.6,
+                origin="upper",
+                extent=extent,
+            )
 
-        ax.contour(
-            dem_resampled,
-            levels=levels,
-            colors=colors_rgb,
-            linewidths=0.5,
-            origin="upper",
-            extent=extent,
-    )
-
-    # --- Tight layout and save image ---
+    # --- Save ---
     plt.tight_layout(pad=0)
     plt.savefig(output_path, bbox_inches="tight", pad_inches=0)
     plt.close()
 
-    # --- Embed metadata ---
+    # --- Metadata ---
     meters_per_pixel = scale.meters_per_pixel(lat, zoom_level)
     bbox = (
         lat - height * meters_per_pixel / 2,
@@ -138,6 +131,7 @@ def generate_wallpaper(
         lon - width * meters_per_pixel / 2,
         lon + width * meters_per_pixel / 2,
     )
+
     exif_dict = metadata.build_exif_metadata(
         version="0.3.0",
         lat=lat,
@@ -153,4 +147,9 @@ def generate_wallpaper(
         dem_source=dem_source,
         dem_resolution=dem_resolution,
     )
-    metadata.write_metadata(image_path=output_path, exif_dict=exif_dict, version="0.3.0")
+
+    metadata.write_metadata(
+        image_path=output_path,
+        exif_dict=exif_dict,
+        version="0.3.0",
+    )
