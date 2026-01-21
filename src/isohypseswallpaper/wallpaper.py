@@ -108,11 +108,14 @@ def generate_wallpaper(
     # --- Contours ---
     if contour_interval is not None:
         levels = np.arange(dem_resampled.min(), dem_resampled.max(), contour_interval)
+
         if isinstance(contour_color, list):
-            n_colors = len(contour_color)
-            colors_rgb = [interpolate_colors(contour_color, np.full_like(level, 1.0))[0] for level in levels]
+            # Sample the gradient evenly across contour levels
+            t = np.linspace(0, 1, len(levels))
+            colors_rgb = interpolate_colors(contour_color, t[:, None])[:, 0, :]
         else:
             colors_rgb = contour_color
+
         ax.contour(
             dem_resampled,
             levels=levels,
@@ -120,7 +123,7 @@ def generate_wallpaper(
             linewidths=0.5,
             origin="upper",
             extent=extent,
-        )
+    )
 
     # --- Tight layout and save image ---
     plt.tight_layout(pad=0)
