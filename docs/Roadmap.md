@@ -28,7 +28,7 @@ This version establishes a solid technical base. The goal is to make sure the ma
 
 ## Version 0.2.x – Metadata & Presets
 
-**Status:** Planned  
+**Status:** Implemented  
 **Focus:** Reproducibility and ease of use
 
 ### Features
@@ -57,10 +57,10 @@ Screen-size presets remove friction for common use cases while keeping flexibili
 **Focus:** Visual quality and usability
 
 ### Features
-- [ ] Built-in color themes (background + contour combinations)
-  - [ ] Clear naming for themes (e.g. “Dark Minimal”, “Paper Map”)
-  - [ ] Ability to override any theme with custom colors
-  - [ ] CLI option to list available themes
+- [x] Built-in color themes (background + contour combinations)
+  - [x] Clear naming for themes (e.g. “Dark Minimal”, “Paper Map”)
+  - [x] Ability to override any theme with custom colors
+  - [x] CLI option to list available themes
 
 ### Rationale
 Choosing colors is one of the most visible parts of the output. Presets help users get good-looking results quickly, while custom colors keep creative freedom.
