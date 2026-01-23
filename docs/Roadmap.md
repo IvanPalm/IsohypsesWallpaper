@@ -12,14 +12,14 @@ The version numbers are indicative and may change as development progresses.
 **Focus:** Core functionality and correctness
 
 ### Features
--[x] CLI tool for generating wallpapers from SRTM elevation data
--[x] Zoom-based scale calculation
--[x] Bounding box computation from center + screen size
--[x] DEM download and clipping via SRTM
--[x] Contour line rendering
--[x] Uniform background color
--[x] Custom output resolution
--[x] Automated tests for core modules
+- [x] CLI tool for generating wallpapers from SRTM elevation data
+- [x] Zoom-based scale calculation
+- [x] Bounding box computation from center + screen size
+- [x] DEM download and clipping via SRTM
+- [x] Contour line rendering
+- [x] Uniform background color
+- [x] Custom output resolution
+- [x] Automated tests for core modules
 
 ### Rationale
 This version establishes a solid technical base. The goal is to make sure the math, data handling, and rendering pipeline are correct before adding more features.
