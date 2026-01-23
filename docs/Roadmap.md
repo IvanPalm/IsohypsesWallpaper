@@ -53,7 +53,7 @@ Screen-size presets remove friction for common use cases while keeping flexibili
 
 ## Version 0.3.x – Color Themes
 
-**Status:** Planned  
+**Status:** Implemented 
 **Focus:** Visual quality and usability
 
 ### Features
